@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Blog Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --black: #0a0a0a;
+            --white: #ffffff;
+            --gray-100: #f5f5f5;
+            --gray-200: #e8e8e8;
+            --gray-400: #aaaaaa;
+            --gray-600: #666666;
+            --border: 1px solid #0a0a0a;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--black);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 400;
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        .site-header {
+            padding: 28px 48px 0;
+        }
+
+        .header-row-1 {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .site-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            color: var(--black);
+        }
+
+        .header-row-1 a {
+            text-decoration: none;
+            background-color: var(--black);
+            color: var(--white);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 10px 22px;
+            border: 1px solid var(--black);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .header-row-1 a:hover {
+            background-color: var(--white);
+            color: var(--black);
+        }
+
+        .header-row-2 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 360px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: var(--border);
+            padding: 8px 14px;
+            background: var(--white);
+        }
+
+        .search-box svg {
+            width: 15px;
+            height: 15px;
+            stroke: var(--gray-400);
+            flex-shrink: 0;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            color: var(--black);
+            width: 100%;
+            background: transparent;
+        }
+
+        .search-box input::placeholder {
+            color: var(--gray-400);
+        }
+
+        .header-row-2 select {
+            border: var(--border);
+            padding: 8px 32px 8px 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            color: var(--black);
+            background: var(--white);
+            outline: none;
+            appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%230a0a0a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+
+        .header-divider {
+            border: none;
+            border-top: var(--border);
+            margin: 0 48px;
+        }
+
+        /* GRID */
+        .blog-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            padding: 32px 48px;
+            margin: 0 48px;
+        }
+
+        .blog-card {
+            padding: 32px 28px;
+            border: var(--border);
+            position: relative;
+        }
+
+        .blog-card h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 6px;
+            color: var(--black);
+        }
+
+        .card-meta {
+            font-size: 0.78rem;
+            color: var(--gray-600);
+            font-weight: 300;
+            margin-bottom: 14px;
+            letter-spacing: 0.02em;
+        }
+
+        .blog-card p.excerpt {
+            font-size: 0.88rem;
+            line-height: 1.65;
+            color: #333;
+            margin-bottom: 16px;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+
+        .card-tags span {
+            font-size: 0.7rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border: 1px solid var(--gray-200);
+            padding: 3px 9px;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        .read-more {
+            display: inline-block;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--black);
+            border-bottom: 1px solid var(--black);
+            padding-bottom: 1px;
+            transition: opacity 0.2s;
+        }
+
+        .read-more:hover {
+            opacity: 0.5;
+        }
+
+        /* PAGINATION */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 28px 48px;
+            border-top: var(--border);
+            margin: 0 48px;
+        }
+
+        .pagination a {
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--black);
+            border: var(--border);
+            padding: 8px 20px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .pagination a:hover {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .pagination span {
+            font-size: 0.8rem;
+            color: var(--gray-600);
+            font-weight: 300;
+        }
+
+        /* placeholder for missing pagination links */
+        .pagination-spacer {
+            width: 80px;
+        }
+
+        /* FILTER PANEL */
+        .filter-wrapper {
+            position: relative;
+        }
+
+        .filter-btn {
+            border: var(--border);
+            padding: 8px 32px 8px 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            color: var(--black);
+            background: var(--white);
+            outline: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%230a0a0a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+
+        .filter-panel {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            background: var(--white);
+            border: var(--border);
+            padding: 16px;
+            z-index: 100;
+            min-width: 240px;
+        }
+
+        .filter-panel.open {
+            display: block;
+        }
+
+        .filter-section-title {
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--black);
+            margin-bottom: 8px;
+        }
+
+        .filter-search {
+            width: 100%;
+            border: var(--border);
+            padding: 6px 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            outline: none;
+            margin-bottom: 8px;
+            color: var(--black);
+        }
+
+        .filter-list {
+            max-height: 120px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+
+        .filter-list label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            cursor: pointer;
+            padding: 3px 0;
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: 400;
+        }
+
+        .filter-divider {
+            border: none;
+            border-top: 1px solid var(--gray-200);
+            margin: 12px 0;
+        }
+
+        .filter-apply {
+            width: 100%;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 9px;
+            border: var(--border);
+            background: var(--black);
+            color: var(--white);
+            cursor: pointer;
+        }
+
+        /* DATE FILTER PANEL */
+        .date-filter-wrapper {
+            position: relative;
+        }
+
+        .date-filter-panel {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            background: var(--white);
+            border: var(--border);
+            padding: 16px;
+            z-index: 100;
+            min-width: 200px;
+        }
+
+        .date-filter-panel.open {
+            display: block;
+        }
+
+        .date-filter-panel input[type="date"] {
+            width: 100%;
+            border: var(--border);
+            padding: 6px 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            outline: none;
+            margin-bottom: 12px;
+            color: var(--black);
+            background: var(--white);
+        }
+
+        .date-filter-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-clear {
+            display: block;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--black);
+            text-decoration: none;
+            padding: 9px;
+            border: var(--border);
+            background: var(--white);
+        }
+
+        .filter-clear:hover {
+            background: var(--gray-100);
+        }
+
+        .logout-btn {
+            text-decoration: none;
+            background-color: var(--black);
+            color: var(--white);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 10px 22px;
+            border: 1px solid var(--black);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .logout-btn:hover {
+            background-color: var(--white);
+            color: var(--black);
+        }
+
+        .logout-form {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: baseline; /* aligns text baselines instead of center */
+            gap: 16px;
+        }
+
+        .logged-in-user {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            font-weight: 300;
+            letter-spacing: 0.02em;
+        }
+
+        .divider {
+            color: var(--gray-400);
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+<!-- HEADER -->
+<header class="site-header">
+    <div class="header-row-1">
+        <div class="header-left">
+            <h1>Blog Application</h1>
+            <span class="divider" sec:authorize="isAuthenticated()">|</span>
+            <span class="logged-in-user" sec:authorize="isAuthenticated()">
+                    Hello, <span sec:authentication="principal.fullName"></span>
+                </span>
+        </div>
+
+        <div class="header-actions">
+            <a th:href="@{/blog/posts/new}" sec:authorize="isAuthenticated()">+ CREATE NEW BLOG</a>
+
+            <form th:action="@{/auth/logout}" method="post" sec:authorize="isAuthenticated()" class="logout-form">
+                <button class="logout-btn" type="submit">Logout</button>
+            </form>
+
+            <a th:href="@{/auth/login}" sec:authorize="!isAuthenticated()">Login</a>
+        </div>
+    </div>
+    <form th:action="@{/blog/home}" method="get">
+        <input type="hidden" name="start" value="1">
+        <input type="hidden" name="limit" th:value="${limit}">
+        <div class="header-row-2">
+            <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" name="search" placeholder="Search posts..." th:value="${search}"
+                       onkeydown="if(event.key === 'Enter') { event.preventDefault(); submitSearchOnly(this.value); }">
+            </div>
+            <div class="filter-wrapper">
+                <button type="button" class="filter-btn" onclick="toggleFilter()">Filter by author and tags</button>
+                <div class="filter-panel" id="filterPanel">
+
+                    <!-- Author -->
+                    <div class="filter-section-title">Author</div>
+                    <input class="filter-search" type="text" placeholder="Search author..."
+                           oninput="filterAuthors(this.value)">
+                    <div class="filter-list" id="authorList">
+                        <label>
+                            <input type="radio" name="author" value="" th:checked="${selectedAuthor == null}"> All
+                        </label>
+                        <label th:each="author : ${authors}">
+                            <input type="radio" name="author" th:value="${author}"
+                                   th:checked="${author == selectedAuthor}">
+                            <span th:text="${author}"></span>
+                        </label>
+                    </div>
+
+                    <hr class="filter-divider">
+
+                    <!-- Tags -->
+                    <div class="filter-section-title">Tags</div>
+                    <input class="filter-search" type="text" placeholder="Search tags..."
+                           oninput="filterTags(this.value)">
+                    <div class="filter-list" id="tagList">
+                        <label th:each="tag : ${tags}">
+                            <input type="checkbox" name="tagIds" th:value="${tag.id}"
+                                   th:checked="${selectedTagIds != null && selectedTagIds.contains(tag.id)}">
+                            <span th:text="${tag.name}"></span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="filter-apply">Apply Filter</button>
+                </div>
+            </div>
+            <div class="date-filter-wrapper">
+                <button type="button" class="filter-btn" onclick="toggleDateFilter()">Filter by date</button>
+                <div class="date-filter-panel" id="dateFilterPanel">
+                    <div class="filter-section-title">From</div>
+                    <input type="date" name="fromDate" th:value="${fromDate}">
+
+                    <div class="filter-section-title">To</div>
+                    <input type="date" name="toDate" th:value="${toDate}">
+
+                    <div class="date-filter-actions">
+                        <button type="submit" class="filter-apply">Apply</button>
+                        <a th:href="@{/blog/home(start=1, limit=${limit}, order=${order}, search=${search}, author=${selectedAuthor}, tagIds=${selectedTagIds})}"
+                           class="filter-clear">Clear</a>
+                    </div>
+                </div>
+            </div>
+            <select name="order" onchange="this.form.submit()">
+                <option value="desc" th:selected="${order == 'desc'}">Sort by: Newest first</option>
+                <option value="asc" th:selected="${order == 'asc'}">Sort by: Oldest first</option>
+            </select>
+        </div>
+    </form>
+</header>
+
+<hr class="header-divider">
+
+<!-- BLOG GRID -->
+<div class="blog-grid">
+    <div class="blog-card" th:each="post : ${posts}">
+        <h2 th:text="${post.title}"></h2>
+
+        <p class="card-meta">
+            <span th:text="${post.user.fullName}"></span>&nbsp;·&nbsp;
+            <span th:text="${#temporals.format(post.publishedAt, 'dd MMM yyyy')}"></span>
+        </p>
+
+        <p class="excerpt" th:text="${post.excerpt}"></p>
+
+        <div class="card-tags">
+            <span th:each="tag : ${post.tags}" th:text="${tag.name}"></span>
+        </div>
+
+        <a class="read-more" th:href="@{/blog/posts/{id}(id=${post.id})}">Read more →</a>
+    </div>
+</div>
+
+<!-- PAGINATION -->
+<div class="pagination">
+    <a th:if="${start > 1}"
+       th:href="@{/blog/home(start=${start - limit}, limit=${limit}, order=${order}, search=${search}, author=${selectedAuthor}, tagIds=${selectedTagIds}, fromDate=${fromDate}, toDate=${toDate})}">← Previous</a>
+    <div class="pagination-spacer" th:if="${start == 1}"></div>
+
+    <span>Page <span th:text="${currentPage + 1}"></span></span>
+
+    <a th:if="${start + limit <= totalPosts}"
+       th:href="@{/blog/home(start=${start + limit}, limit=${limit}, order=${order}, search=${search}, author=${selectedAuthor}, tagIds=${selectedTagIds}, fromDate=${fromDate}, toDate=${toDate})}">Next →</a>
+    <div class="pagination-spacer" th:if="${start + limit > totalPosts}"></div>
+</div>
+
+<script>
+    function toggleFilter() {
+        document.getElementById('filterPanel').classList.toggle('open');
+    }
+
+    function toggleDateFilter() {
+        document.getElementById('dateFilterPanel').classList.toggle('open');
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.filter-wrapper')) {
+            document.getElementById('filterPanel').classList.remove('open');
+        }
+        if (!e.target.closest('.date-filter-wrapper')) {
+            document.getElementById('dateFilterPanel').classList.remove('open');
+        }
+    });
+
+    function filterAuthors(val) {
+        document.querySelectorAll('#authorList label').forEach(function(label) {
+            const text = label.textContent.toLowerCase();
+            label.style.display = text.includes(val.toLowerCase()) ? '' : 'none';
+        });
+    }
+
+    function filterTags(val) {
+        document.querySelectorAll('#tagList label').forEach(function(label) {
+            const text = label.textContent.toLowerCase();
+            label.style.display = text.includes(val.toLowerCase()) ? '' : 'none';
+        });
+    }
+
+    function submitSearchOnly(searchValue) {
+        const params = new URLSearchParams();
+        params.set('start', '1');
+        params.set('limit', document.querySelector('input[name="limit"]').value);
+        params.set('order', 'desc');
+        if (searchValue.trim() !== '') {
+            params.set('search', searchValue.trim());
+        }
+        window.location.href = '/blog/home?' + params.toString();
+    }
+</script>
+</body>
+</html>

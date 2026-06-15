@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>New Blog</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --black: #0a0a0a;
+            --white: #ffffff;
+            --gray-100: #f5f5f5;
+            --gray-200: #e8e8e8;
+            --gray-400: #aaaaaa;
+            --gray-600: #666666;
+            --border: 1px solid #0a0a0a;
+            --error: #cc0000;
+        }
+
+        body {
+            background-color: var(--gray-100);
+            color: var(--black);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 400;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 60px 24px;
+        }
+
+        /* ── CARD ── */
+        .container {
+            background: var(--white);
+            border: var(--border);
+            width: 100%;
+            max-width: 680px;
+            padding: 48px 56px;
+        }
+
+        .container h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            margin-bottom: 40px;
+            text-align: center;
+            color: var(--black);
+        }
+
+        /* ── FORM FIELDS ── */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 28px;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--black);
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            border: var(--border);
+            padding: 12px 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            color: var(--black);
+            background: var(--white);
+            outline: none;
+            transition: border-color 0.2s;
+            resize: none;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            background: var(--gray-100);
+        }
+
+        textarea {
+            min-height: 220px;
+            line-height: 1.6;
+        }
+
+        input[type="text"]::placeholder,
+        textarea::placeholder {
+            color: var(--gray-400);
+        }
+
+        /* ── ERROR ── */
+        .error {
+            font-size: 0.78rem;
+            color: var(--error);
+            font-weight: 400;
+        }
+
+        /* ── BUTTONS ── */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+
+        .button-group button {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 12px 28px;
+            border: var(--border);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        /* Save Draft — outlined */
+        .button-group button[value="draft"] {
+            background: var(--white);
+            color: var(--black);
+        }
+
+        .button-group button[value="draft"]:hover {
+            background: var(--gray-100);
+        }
+
+        /* Publish — filled */
+        .button-group button[value="publish"] {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .button-group button[value="publish"]:hover {
+            background: var(--gray-600);
+        }
+
+        .back-btn {
+            display: inline-block;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--black);
+            border-bottom: 1px solid var(--black);
+            padding-bottom: 1px;
+            margin-bottom: 24px;
+            transition: opacity 0.2s;
+        }
+
+        .back-btn:hover {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a th:href="@{/blog/home}" class="back-btn">← Back to Home</a>
+
+    <h1>New Blog Post</h1>
+
+    <form th:action="@{/blog/posts}" th:object="${post}" method="POST">
+        <div class="field">
+            <label>Title</label>
+            <input type="text" th:field="*{title}" required>
+            <span th:if="${#fields.hasErrors('title')}"
+                  th:errors="*{title}"
+                  class="error">
+                    </span>
+        </div>
+
+        <div class="field">
+            <label>Content</label>
+            <textarea th:field="*{content}" required></textarea>
+        </div>
+
+        <div class="field">
+            <label>Author</label>
+            <input type="text" th:value="${loggedInUser}" disabled>
+        </div>
+
+        <div class="field">
+            <label>Tags</label>
+            <input type="text" name="tagNames" placeholder="spring, java, backend..." required>
+        </div>
+
+        <div class="button-group">
+            <button type="submit" name="action" value="draft">Save Draft</button>
+            <button type="submit" name="action" value="publish">Publish</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>
